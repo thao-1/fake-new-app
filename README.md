@@ -1,5 +1,7 @@
 # Fake News Detection System
 
+🚀 **[Live Demo: Try the App Here!](https://fake-new-app-applied-ml.streamlit.app/)**
+
 A comprehensive Streamlit application for detecting fake news with AI-powered explanations, designed for content moderation teams.
 
 ## Features
