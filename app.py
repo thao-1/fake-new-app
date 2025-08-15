@@ -18,7 +18,6 @@ import pickle
 import re
 import urllib.parse
 import zipfile
-from newspaper import Article
 
 # Load environment variables
 load_dotenv()
@@ -239,29 +238,8 @@ class FakeNewsDetector:
             return None, None
     
     def extract_text_from_url(self, url):
-        """Extract text content from a URL using newspaper3k and Beautiful Soup"""
+        """Extract text content from a URL using Beautiful Soup"""
         try:
-            # First try with newspaper3k (best for news articles)
-            try:
-                article = Article(url)
-                article.download()
-                article.parse()
-                
-                # Get title and text
-                title = article.title or ""
-                text = article.text or ""
-                
-                # Combine title and text
-                full_text = f"{title}\n\n{text}" if title else text
-                
-                if len(full_text.strip()) > 100:  # If we got substantial content
-                    return full_text[:8000]  # Return more text for better analysis
-                    
-            except Exception as newspaper_error:
-                print(f"Newspaper3k failed: {newspaper_error}")
-                pass  # Fall back to Beautiful Soup
-            
-            # Fallback: Use Beautiful Soup for more general web scraping
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',

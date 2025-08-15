@@ -9,5 +9,3 @@ plotly
 requests
 beautifulsoup4
 python-dotenv
-newspaper3k
-lxml
