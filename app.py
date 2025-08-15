@@ -105,8 +105,11 @@ class FakeNewsDetector:
                         with zipfile.ZipFile('model_files.zip', 'r') as zip_ref:
                             zip_ref.extractall('.')
                         st.success("✅ Model files extracted successfully!")
+                        # Force a rerun to reload with extracted files
+                        st.rerun()
                     except Exception as e:
                         st.error(f"Failed to extract model files: {e}")
+                        return None, None
             
             # Try to load pre-trained model first (preferred for deployment)
             if os.path.exists('trained_model.pkl') and os.path.exists('vectorizer.pkl'):
@@ -449,14 +452,12 @@ def main():
         st.header("📊 Model Info")
         st.info("💡 The model trains automatically on first run. Use the button below only if you want to retrain.")
         
-        # Check if dataset exists
-        if not os.path.exists('WELFake_Dataset.csv'):
-            st.error("Dataset file 'WELFake_Dataset.csv' not found!")
-            st.stop()
-        
-        # Show dataset info
-        dataset_size = os.path.getsize('WELFake_Dataset.csv') / (1024*1024)  # Size in MB
-        st.info(f"💾 Using full WELFake dataset ({dataset_size:.1f} MB)")
+        # Show dataset info if available
+        if os.path.exists('WELFake_Dataset.csv'):
+            dataset_size = os.path.getsize('WELFake_Dataset.csv') / (1024*1024)  # Size in MB
+            st.info(f"💾 Using full WELFake dataset ({dataset_size:.1f} MB)")
+        else:
+            st.info("💾 Using pre-trained model (no dataset needed)")
         
         if st.button("🔄 Retrain Model", key="train_button"):
             try:
@@ -483,12 +484,16 @@ def main():
                 if accuracy is not None:
                     st.session_state.model_trained = True
                     st.sidebar.success(f"✅ Model ready! Accuracy: {accuracy:.2%}")
-                    st.sidebar.info(f"📊 Dataset size: {dataset_size} articles")
+                    if isinstance(dataset_size, str):
+                        st.sidebar.info(f"📊 {dataset_size}")
+                    else:
+                        st.sidebar.info(f"📊 Dataset size: {dataset_size} articles")
                     st.success("🎉 Fake News Detection System is ready to use!")
                 else:
+                    # For deployment, still allow the app to work even if model loading fails initially
                     st.session_state.model_trained = False
-                    st.sidebar.error("❌ Failed to load model. Please use 'Train/Retrain Model' button.")
-                    st.error("Model initialization failed. Please train the model using the sidebar.")
+                    st.sidebar.warning("⚠️ Model not loaded yet. The app will try to extract and load the model.")
+                    st.info("Model is being prepared... Please refresh the page in a moment.")
         except Exception as e:
             st.session_state.model_trained = False
             st.sidebar.error(f"❌ Error initializing: {str(e)}")
