@@ -12,8 +12,8 @@ from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema import HumanMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import HumanMessage
 import pickle
 import re
 import urllib.parse
